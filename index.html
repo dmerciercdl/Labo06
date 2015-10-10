@@ -15,7 +15,22 @@
     </div>
 
     <script type="text/template" id="task-list-template">
-    <h4>testing template</h4>
+        <table class="table striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Task</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% tasks.each( function( task ){ %>
+            <tr>
+                <td><%= task.get( 'id' ) %></td>
+                <td><%= task.get( 'task' ) %></td>
+            </tr>
+            <% }); %>
+            </tbody>
+        </table>
     </script>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
