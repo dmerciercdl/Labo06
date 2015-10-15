@@ -20,8 +20,20 @@ $.fn.serializeObject = function() {
 };
 
 var Task = Backbone.Model.extend({
-    //'urlRoot': '/tasks',
-    'url': 'http://localhost:5000/tasks'
+    'urlRoot': 'http://localhost:5000/tasks',
+
+    'defaults': {
+        id: null,
+        task: 'default'
+    },
+
+    'parse': function( apiResponse ){
+        console.log(apiResponse);
+        if(apiResponse.task.task === undefined ) {
+            return apiResponse;
+        }
+        return apiResponse.task;
+    }
 });
 
 var Tasks = Backbone.Collection.extend({
@@ -53,10 +65,20 @@ var TaskEditView = Backbone.View.extend({
     'el': '.page',
     'template': _.template($('#task-edit-template').html()),
 
-
-    'render': function() {
-        var task = new Task();
-        this.$el.html(  this.template( { 'task': task } )  );
+    'render': function(options) {
+        if(options.id) {
+            var that = this;
+            var existingTask = new Task({id: options.id});
+            existingTask.fetch({
+                success: function(gotObject) {
+                    that.$el.html( that.template( { task: existingTask } ) );
+                }
+            });
+        }
+        else {
+            var task = new Task();
+            this.$el.html( this.template( { task: null } ) );
+        }
     },
 
     'events': {
@@ -64,7 +86,6 @@ var TaskEditView = Backbone.View.extend({
     },
 
     saveTask: function(ev) {
-
         var taskDetails = $(ev.currentTarget).serializeObject();
         var task = new Task;
         console.log(taskDetails);
@@ -84,7 +105,8 @@ var TaskEditView = Backbone.View.extend({
 var Router = Backbone.Router.extend({
     routes: {
         '' : 'home', // intentionally blank for the home page
-        'new' : 'editTask'
+        'new' : 'editTask',
+        'edit/:id' : 'editTask'
     }
 });
 
@@ -97,8 +119,8 @@ router.on('route:home', function() {
     taskListView.render();
 });
 
-router.on('route:editTask', function() {
-    taskEditView.render();
+router.on('route:editTask', function(id) {
+    taskEditView.render({id: id});
 });
 
 Backbone.history.start();

@@ -16,20 +16,20 @@
 
     <script type="text/template" id="task-list-template">
         <a href="#/new" class="btn btn-primary">New task</a>
+        <br><br>
         <!-- <hr /> -->
         <table class="table striped">
             <thead>
             <tr>
-                <th>ID</th>
-                <th>Task</th>
+                <th>Task description</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
             <% tasks.each( function( task ){ %>
             <tr>
-                <td><%= task.get( 'id' ) %></td>
                 <td><%= task.get( 'task' ) %></td>
-                <td><%= task.get( 'task' ) %></td>
+                <td><a href="#/edit/<%= task.id %>" class="btn btn-primary" role="button">Edit</a></td>
             </tr>
             <% }); %>
             </tbody>
@@ -38,11 +38,11 @@
 
     <script type="text/template" id="task-edit-template">
         <form class="edit-task-form">
-            <legend>Create Task</legend>
+            <legend><%= task ? 'Edit' : 'Create' %> Task</legend>
             <label>Task</label>
-            <input type="text" name="task" />
+            <input type="text" name="task" value="<%= task ? task.get('task') : '' %>" />
             <hr />
-            <button type="submit" class="btn">Create</button>
+            <button type="submit" class="btn"><%= task ? 'Edit' : 'Create' %></button>
         </form>
     </script>
 
