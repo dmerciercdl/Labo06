@@ -43,6 +43,10 @@
             <input type="text" name="task" value="<%= task ? task.get('task') : '' %>" />
             <hr />
             <button type="submit" class="btn"><%= task ? 'Edit' : 'Create' %></button>
+            <% if(task) { %>
+                <input type="hidden" name="id" value="<%= task.id%>" />
+                <button class="btn btn-danger delete">Delete</button>
+            <% }; %>
         </form>
     </script>
 

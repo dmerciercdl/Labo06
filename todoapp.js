@@ -28,10 +28,13 @@ var Task = Backbone.Model.extend({
     },
 
     'parse': function( apiResponse ){
+        console.log("parsing model");
         console.log(apiResponse);
-        if(apiResponse.task.task === undefined ) {
+        if(apiResponse.task.task == undefined ) {
+            console.log("task.task is undefined");
             return apiResponse;
         }
+        console.log("task is defined");
         return apiResponse.task;
     }
 });
@@ -41,6 +44,8 @@ var Tasks = Backbone.Collection.extend({
     'model': Task,
 
     'parse': function( apiResponse ){
+        console.log("parsing collection");
+        console.log(apiResponse);
         return apiResponse.tasks;
     }
 });
@@ -66,12 +71,13 @@ var TaskEditView = Backbone.View.extend({
     'template': _.template($('#task-edit-template').html()),
 
     'render': function(options) {
+        var that = this;
         if(options.id) {
-            var that = this;
-            var existingTask = new Task({id: options.id});
-            existingTask.fetch({
+            that.existingTask = new Task({id: options.id});
+            that.existingTask.fetch({
                 success: function(gotObject) {
-                    that.$el.html( that.template( { task: existingTask } ) );
+                    console.log(gotObject);
+                    that.$el.html( that.template( { task: that.existingTask } ) );
                 }
             });
         }
@@ -82,7 +88,8 @@ var TaskEditView = Backbone.View.extend({
     },
 
     'events': {
-        'submit .edit-task-form': 'saveTask'
+        'submit .edit-task-form': 'saveTask',
+        'click .delete': 'deleteTask'
     },
 
     saveTask: function(ev) {
@@ -91,11 +98,22 @@ var TaskEditView = Backbone.View.extend({
         console.log(taskDetails);
         task.save(taskDetails, {
             success: function(task) {
-                router.navigate('', {trigger: true});
             },
             error: function(model, response) {
                 var responseObj = $.parseJSON(response.responseText);
                 console.log('Type: ' + responseObj.error + ' Message: ' + responseObj.message);
+            }
+        });
+
+        router.navigate('', {trigger: true});
+
+        return false;
+    },
+
+    deleteTask: function(ev) {
+        that.existingTask.destroy({
+            success: function() {
+                router.navigate('', {trigger: true});
             }
         });
         return false;
@@ -116,10 +134,12 @@ var taskEditView = new TaskEditView({ });
 var router = new Router();
 
 router.on('route:home', function() {
+    console.log("routing to home");
     taskListView.render();
 });
 
 router.on('route:editTask', function(id) {
+    console.log("routing to editTask");
     taskEditView.render({id: id});
 });
 
